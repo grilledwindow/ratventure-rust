@@ -1,1 +1,5 @@
-pub mod option;
+pub mod main_menu;
+
+trait Menu {
+    
+}

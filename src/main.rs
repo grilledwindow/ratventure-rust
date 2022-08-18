@@ -1,12 +1,18 @@
+use std::io;
+
+use crossterm::{Result, execute};
+use crossterm::event::{read, Event, KeyCode::*};
+use crossterm::terminal::{enable_raw_mode, disable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::cursor::*;
+
 pub mod menu;
 
-use menu::option::MainMenuOption;
+use menu::main_menu::{ Direction, Menu, MainMenuOption};
 
-fn main() {
-    load_main_menu();
-}
+fn main() -> Result<()> {
+    enable_raw_mode()?;
 
-fn load_main_menu() {
+    let mut stdout = io::stdout();
     const MAIN_MENU_OPTIONS: [MainMenuOption; 4] = [
         MainMenuOption::NewGame,
         MainMenuOption::ResumeGame,
@@ -14,8 +20,23 @@ fn load_main_menu() {
         MainMenuOption::Exit,
     ];
 
-    println!("Ratventure");
-    for option in &MAIN_MENU_OPTIONS {
-        println!("[ ] {}", option);
+    let mut main_menu = Menu::new("Ratventure", &MAIN_MENU_OPTIONS);
+
+    execute!(stdout, EnterAlternateScreen, Hide)?;
+    main_menu.display_full(&mut stdout)?;
+
+    loop {
+        let event = read()?;
+        if let Event::Key(key_event) = event {
+            match key_event.code {
+                Enter => break,
+                Up | Char('k') | Char('w') => { main_menu.move_selection(&mut stdout, Direction::Up)?; },
+                Down | Char('j') | Char('s') => { main_menu.move_selection(&mut stdout, Direction::Down)?; }, 
+                _ => continue,
+            };
+        }
     }
+
+    disable_raw_mode()?;
+    execute!(stdout, LeaveAlternateScreen, Show)
 }
