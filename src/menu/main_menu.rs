@@ -51,6 +51,10 @@ impl<'a, T> Menu<'a, T> where
         Menu { title, options, selected_option: 0 }
     }
 
+    pub fn is_exit_selected(&self) -> bool {
+        self.selected_option == 3
+    }
+
     pub fn display_full(&self, stdout: &mut Stdout) -> Result<()> {
         self.display_title(stdout)?;
         self.display_options(stdout)

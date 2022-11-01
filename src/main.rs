@@ -29,7 +29,7 @@ fn main() -> Result<()> {
         let event = read()?;
         if let Event::Key(key_event) = event {
             match key_event.code {
-                Enter => break,
+                Enter => { if main_menu.is_exit_selected() { break }},
                 Up | Char('k') | Char('w') => { main_menu.move_selection(&mut stdout, Direction::Up)?; },
                 Down | Char('j') | Char('s') => { main_menu.move_selection(&mut stdout, Direction::Down)?; }, 
                 _ => continue,
